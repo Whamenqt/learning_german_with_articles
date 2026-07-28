@@ -120,6 +120,14 @@ export function DashboardPage() {
                         </Link>
                         {a.status === 'published' && a.slug && (
                           <>
+                            <a
+                              href={publicUrl(a.slug)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="btn btn--small"
+                            >
+                              View live ↗
+                            </a>
                             <button className="btn btn--secondary btn--small" onClick={() => copyUrl(a.slug!)}>
                               Copy URL
                             </button>

@@ -80,6 +80,22 @@ export interface SourceAttribution {
   published_date?: string | null
 }
 
+export type QuizDifficulty = 'easy' | 'medium' | 'hard'
+
+export interface QuizQuestion {
+  question: string
+  options: string[] // exactly 4 options
+  correct_index: number // 0-3
+  difficulty: QuizDifficulty
+  explanation?: string | null
+}
+
+/** Two segments: grammar (correct-grammar selection) and comprehension (pure understanding). */
+export interface Quiz {
+  grammar: QuizQuestion[]
+  comprehension: QuizQuestion[]
+}
+
 /** The structured lesson payload produced by ChatGPT/Claude and uploaded/pasted by the admin. */
 export interface LessonJSON {
   german_headline: string
@@ -94,6 +110,7 @@ export interface LessonJSON {
   difficult_concepts: DifficultConcept[]
   chatgpt_instructions: string
   source: SourceAttribution
+  quiz?: Quiz
 }
 
 export interface ArticleContentRow {
@@ -108,6 +125,7 @@ export interface ArticleContentRow {
   conversation_questions: ConversationQuestions
   difficult_concepts: DifficultConcept[]
   chatgpt_instructions: string
+  quiz: Quiz | null
   generation_model: string | null
   generation_prompt_version: string | null
   created_at: string

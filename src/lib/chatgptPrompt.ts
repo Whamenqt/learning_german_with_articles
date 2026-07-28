@@ -71,6 +71,7 @@ Rules:
 - Only include grammar notes for structures that actually appear in the article you wrote.
 - Write comprehension questions that are directly answerable from your German article.
 - Write opinion questions that invite discussion of the topic, and personal questions that connect the topic to the learner's own life/work/experience.
+- Also include a "quiz" with two segments: "grammar" (questions that test choosing the grammatically correct option, based on structures used in your German article) and "comprehension" (questions that test understanding of the article's content). Each segment needs at least 5 questions, ranging from easy to hard (include a mix of "easy", "medium", and "hard"), each with exactly 4 options and one correct_index.
 - Return ONLY valid JSON matching the schema below — no markdown code fences, no commentary before or after it.
 
 === REQUIRED JSON SCHEMA ===
@@ -107,6 +108,14 @@ Rules:
     { "term": "string", "explanation_en": "string" }
   ],
   "chatgpt_instructions": "string (reusable instructions for a ChatGPT conversation practice session using this material)",
+  "quiz": {
+    "grammar": [
+      { "question": "string", "options": ["string", "string", "string", "string"], "correct_index": 0, "difficulty": "easy | medium | hard", "explanation": "string | null" }
+    ],
+    "comprehension": [
+      { "question": "string", "options": ["string", "string", "string", "string"], "correct_index": 0, "difficulty": "easy | medium | hard", "explanation": "string | null" }
+    ]
+  },
   "source": {
     "title": "${article.source_title ?? ''}",
     "publication": "${article.source_publication ?? ''}",

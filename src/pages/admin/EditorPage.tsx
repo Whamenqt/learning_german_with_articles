@@ -7,12 +7,14 @@ import {
   isSlugAvailable,
   publishArticle,
   recordExport,
+  saveQuiz,
   unpublishArticle,
   updateArticleContent,
   updateArticleFields,
   replaceVocabulary,
 } from '@/lib/api'
 import { slugify } from '@/lib/slug'
+import { validateQuizJson } from '@/lib/lessonSchema'
 import { downloadDocxExport, buildMarkdownExport, downloadTextFile } from '@/lib/exportDocument'
 import type {
   ArticleContentRow,
@@ -20,6 +22,7 @@ import type {
   DifficultConcept,
   GrammarNote,
   LanguageLevel,
+  Quiz,
   UsefulPhrase,
   VocabularyRow,
 } from '@/lib/types'
@@ -36,10 +39,13 @@ const emptyContent: ArticleContentRow = {
   conversation_questions: { opinion: [], personal: [] },
   difficult_concepts: [],
   chatgpt_instructions: '',
+  quiz: null,
   generation_model: null,
   generation_prompt_version: null,
   created_at: '',
 }
+
+const DIFFICULTY_ORDER: Record<string, number> = { easy: 0, medium: 1, hard: 2 }
 
 function linesToArray(text: string): string[] {
   return text
@@ -68,6 +74,10 @@ export function EditorPage() {
   const [saving, setSaving] = useState(false)
   const [publishing, setPublishing] = useState(false)
   const [exporting, setExporting] = useState<'docx' | 'markdown' | null>(null)
+
+  const [quizJsonText, setQuizJsonText] = useState('')
+  const [quizErrors, setQuizErrors] = useState<string[]>([])
+  const [savingQuiz, setSavingQuiz] = useState(false)
 
   const load = useCallback(async () => {
     if (!id) return
@@ -202,6 +212,7 @@ export function EditorPage() {
         },
         difficult_concepts: content.difficult_concepts,
         chatgpt_instructions: content.chatgpt_instructions,
+        quiz: content.quiz,
       })
       await replaceVocabulary(article.id, vocabulary)
       const updatedArticle = await updateArticleFields(article.id, {
@@ -214,6 +225,30 @@ export function EditorPage() {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSaveQuiz = async () => {
+    setSavingQuiz(true)
+    setQuizErrors([])
+    setNotice(null)
+    setError(null)
+    const result = validateQuizJson(quizJsonText)
+    if (!result.success || !result.data) {
+      setQuizErrors(result.errors)
+      setSavingQuiz(false)
+      return
+    }
+    try {
+      const quiz: Quiz = result.data
+      await saveQuiz(article.id, quiz)
+      setContent((prev) => ({ ...prev, quiz }))
+      setQuizJsonText('')
+      setNotice('Quiz saved.')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    } finally {
+      setSavingQuiz(false)
     }
   }
 
@@ -508,6 +543,61 @@ export function EditorPage() {
       <div className="card" style={{ marginTop: 16 }}>
         <h2 style={{ fontSize: 18 }}>ChatGPT conversation instructions</h2>
         <textarea rows={4} value={content.chatgpt_instructions} onChange={(e) => setContent({ ...content, chatgpt_instructions: e.target.value })} />
+      </div>
+
+      {/* Quiz */}
+      <div className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ fontSize: 18 }}>Quiz (grammar & understanding)</h2>
+        <p className="hint" style={{ marginBottom: 12 }}>
+          Two multiple-choice segments shown on the public page: correct-grammar selection, and pure
+          comprehension. Questions run easy → hard and reveal correct/incorrect feedback when clicked.
+        </p>
+
+        {content.quiz ? (
+          <div className="stack" style={{ marginBottom: 16 }}>
+            {(['grammar', 'comprehension'] as const).map((segment) => (
+              <div key={segment}>
+                <div style={{ fontWeight: 600, fontSize: 13, textTransform: 'uppercase', color: 'var(--text-muted)', marginBottom: 6 }}>
+                  {segment} ({content.quiz![segment].length} questions)
+                </div>
+                <ol style={{ margin: 0, paddingLeft: 20 }}>
+                  {[...content.quiz![segment]]
+                    .sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty])
+                    .map((q, i) => (
+                      <li key={i} style={{ marginBottom: 4, fontSize: 14 }}>
+                        <span className="badge" style={{ marginRight: 6 }}>{q.difficulty}</span>
+                        {q.question} <em style={{ color: 'var(--text-muted)' }}>— correct: {q.options[q.correct_index]}</em>
+                      </li>
+                    ))}
+                </ol>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="alert alert--warn" style={{ marginBottom: 16 }}>No quiz saved yet for this article.</div>
+        )}
+
+        <div className="field">
+          <label>Paste quiz JSON (replaces the saved quiz)</label>
+          <textarea
+            rows={6}
+            placeholder='{ "grammar": [...], "comprehension": [...] }'
+            value={quizJsonText}
+            onChange={(e) => setQuizJsonText(e.target.value)}
+          />
+        </div>
+        {quizErrors.length > 0 && (
+          <div className="alert alert--error" style={{ marginBottom: 12 }}>
+            <ul style={{ margin: 0, paddingLeft: 18 }}>
+              {quizErrors.map((e, i) => (
+                <li key={i}>{e}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+        <button className="btn btn--secondary" onClick={() => void handleSaveQuiz()} disabled={savingQuiz || !quizJsonText.trim()}>
+          {savingQuiz ? 'Validating…' : 'Validate & save quiz'}
+        </button>
       </div>
 
       <div className="row" style={{ marginTop: 16, marginBottom: 32 }}>

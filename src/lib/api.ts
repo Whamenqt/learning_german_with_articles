@@ -8,6 +8,7 @@ import type {
   FullArticle,
   LanguageLevel,
   LessonJSON,
+  Quiz,
   VocabularyRow,
 } from './types'
 
@@ -156,6 +157,7 @@ export async function saveGeneratedContent(articleId: string, lesson: LessonJSON
       conversation_questions: lesson.conversation_questions,
       difficult_concepts: lesson.difficult_concepts,
       chatgpt_instructions: lesson.chatgpt_instructions,
+      quiz: lesson.quiz ?? null,
       generation_model: model ?? 'manual-import',
       generation_prompt_version: 'v1',
     },
@@ -217,6 +219,20 @@ export async function updateArticleContent(articleId: string, content: EditableC
     },
     { onConflict: 'article_id' },
   )
+  if (error) throw error
+}
+
+/**
+ * Saves just the quiz (grammar + comprehension multiple-choice segments) for an
+ * article, without touching the rest of the lesson content. Used by the
+ * Editor page's "paste quiz JSON" import, which lets the admin add/replace a
+ * quiz for an article independently of a full re-generation.
+ */
+export async function saveQuiz(articleId: string, quiz: Quiz): Promise<void> {
+  const { error } = await supabase
+    .from('article_content')
+    .update({ quiz })
+    .eq('article_id', articleId)
   if (error) throw error
 }
 

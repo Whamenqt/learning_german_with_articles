@@ -2,12 +2,66 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchPublishedArticleBySlug, recordExport } from '@/lib/api'
 import { buildMarkdownExport, downloadDocxExport, downloadTextFile } from '@/lib/exportDocument'
-import type { FullArticle, LanguageLevel } from '@/lib/types'
+import type { FullArticle, LanguageLevel, QuizQuestion } from '@/lib/types'
 
 const LEVEL_LABEL: Record<LanguageLevel, string> = {
   A2: 'Elementary',
   B1: 'Intermediate',
   B2: 'Upper-Intermediate',
+}
+
+const DIFFICULTY_ORDER: Record<string, number> = { easy: 0, medium: 1, hard: 2 }
+
+function sortByDifficulty(questions: QuizQuestion[]): QuizQuestion[] {
+  return [...questions].sort((a, b) => DIFFICULTY_ORDER[a.difficulty] - DIFFICULTY_ORDER[b.difficulty])
+}
+
+/** A single interactive multiple-choice question: click an option, get instant feedback. */
+function QuizQuestionCard({ q, index }: { q: QuizQuestion; index: number }) {
+  const [selected, setSelected] = useState<number | null>(null)
+  const isCorrect = selected !== null && selected === q.correct_index
+
+  return (
+    <div className="card quiz-question">
+      <div className="row" style={{ marginBottom: 8, justifyContent: 'space-between' }}>
+        <strong>
+          {index + 1}. {q.question}
+        </strong>
+        <span className={`badge quiz-difficulty quiz-difficulty--${q.difficulty}`}>{q.difficulty}</span>
+      </div>
+      <div className="quiz-options">
+        {q.options.map((option, i) => {
+          const isSelected = selected === i
+          const showCorrect = selected !== null && i === q.correct_index
+          const showIncorrect = isSelected && i !== q.correct_index
+          const cls = [
+            'quiz-option',
+            showCorrect ? 'quiz-option--correct' : '',
+            showIncorrect ? 'quiz-option--incorrect' : '',
+          ]
+            .filter(Boolean)
+            .join(' ')
+          return (
+            <button
+              key={i}
+              type="button"
+              className={cls}
+              disabled={isCorrect}
+              onClick={() => setSelected(i)}
+            >
+              {option}
+            </button>
+          )
+        })}
+      </div>
+      {selected !== null && (
+        <div className={`quiz-feedback ${isCorrect ? 'quiz-feedback--correct' : 'quiz-feedback--incorrect'}`}>
+          {isCorrect ? '✓ Correct!' : 'Not quite — try another option.'}
+          {isCorrect && q.explanation && <div style={{ marginTop: 4, fontWeight: 400 }}>{q.explanation}</div>}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export function ArticlePage() {
@@ -221,6 +275,32 @@ export function ArticlePage() {
             ))}
           </ol>
         </section>
+
+        {content.quiz && content.quiz.grammar.length > 0 && (
+          <section className="section-card">
+            <div className="section-eyebrow">Step 7</div>
+            <h2 className="section-title">Grammar Check</h2>
+            <div className="banner">Pick the grammatically correct option. Questions get harder as you go.</div>
+            <div className="stack">
+              {sortByDifficulty(content.quiz.grammar).map((q, i) => (
+                <QuizQuestionCard key={i} q={q} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {content.quiz && content.quiz.comprehension.length > 0 && (
+          <section className="section-card">
+            <div className="section-eyebrow">Step 8</div>
+            <h2 className="section-title">Understanding Check</h2>
+            <div className="banner">Test how well you understood the article — easy questions first, harder ones last.</div>
+            <div className="stack">
+              {sortByDifficulty(content.quiz.comprehension).map((q, i) => (
+                <QuizQuestionCard key={i} q={q} index={i} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section className="print-hide" style={{ marginTop: 12, paddingTop: 8 }}>
           <div className="section-card" style={{ background: 'var(--bg-subtle)' }}>

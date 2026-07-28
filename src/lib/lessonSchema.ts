@@ -53,6 +53,53 @@ const sourceAttributionSchema = z.object({
   published_date: z.string().nullish(),
 })
 
+const quizDifficultyEnum = z.enum(['easy', 'medium', 'hard'])
+
+const quizQuestionSchema = z.object({
+  question: z.string().min(1, 'question is required'),
+  options: z.array(z.string().min(1)).length(4, 'exactly 4 options are required'),
+  correct_index: z.number().int().min(0).max(3),
+  difficulty: quizDifficultyEnum,
+  explanation: z.string().nullish(),
+})
+
+export const quizJsonSchema = z.object({
+  grammar: z.array(quizQuestionSchema).min(3, 'at least 3 grammar questions are required'),
+  comprehension: z.array(quizQuestionSchema).min(3, 'at least 3 comprehension questions are required'),
+})
+
+export type QuizJsonParsed = z.infer<typeof quizJsonSchema>
+
+export interface QuizValidationResult {
+  success: boolean
+  data?: QuizJsonParsed
+  errors: string[]
+}
+
+/** Parses + validates raw text pasted into the Editor's quiz import box. Never throws. */
+export function validateQuizJson(rawText: string): QuizValidationResult {
+  let parsedJson: unknown
+  try {
+    parsedJson = JSON.parse(rawText)
+  } catch (err) {
+    return {
+      success: false,
+      errors: [`The pasted content is not valid JSON: ${err instanceof Error ? err.message : String(err)}`],
+    }
+  }
+
+  const result = quizJsonSchema.safeParse(parsedJson)
+  if (!result.success) {
+    const errors = result.error.issues.map((issue) => {
+      const path = issue.path.join('.') || '(root)'
+      return `${path}: ${issue.message}`
+    })
+    return { success: false, errors }
+  }
+
+  return { success: true, data: result.data, errors: [] }
+}
+
 export const lessonJsonSchema = z.object({
   german_headline: z.string().min(1, 'german_headline is required'),
   introduction: z.string().min(1, 'introduction is required'),
@@ -66,6 +113,7 @@ export const lessonJsonSchema = z.object({
   difficult_concepts: z.array(difficultConceptSchema).default([]),
   chatgpt_instructions: z.string().min(1, 'chatgpt_instructions is required'),
   source: sourceAttributionSchema,
+  quiz: quizJsonSchema.optional(),
 })
 
 export type LessonJsonParsed = z.infer<typeof lessonJsonSchema>
