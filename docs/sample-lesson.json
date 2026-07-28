@@ -1,0 +1,80 @@
+{
+  "german_headline": "Fortschritte in der Zöliakie-Forschung",
+  "introduction": "Forscher haben eine neue Methode entdeckt, um Zöliakie besser zu verstehen. Das könnte Patienten in Zukunft helfen.",
+  "german_article": "Zöliakie ist eine Krankheit, bei der der Körper Gluten nicht verträgt. Menschen mit Zöliakie müssen auf Brot, Nudeln und viele andere Lebensmittel verzichten.\n\nEin Forschungsteam hat jetzt neue Erkenntnisse veröffentlicht. Sie zeigen, wie das Immunsystem auf Gluten reagiert. Diese Information ist wichtig, weil sie helfen könnte, neue Medikamente zu entwickeln.\n\nDie Forscher sagen, dass es noch viele Fragen gibt. Trotzdem ist der Fortschritt ein wichtiger Schritt für die Zukunft.",
+  "vocabulary": [
+    {
+      "german_term": "Forschung",
+      "article": "die",
+      "plural": "Forschungen",
+      "english_meaning": "research",
+      "german_explanation": "Wissenschaftliche Arbeit, um etwas Neues zu lernen",
+      "example_sentence": "Die Forschung zu dieser Krankheit macht Fortschritte.",
+      "word_type": "noun",
+      "difficulty": "B1",
+      "is_essential": true
+    },
+    {
+      "german_term": "verzichten",
+      "article": null,
+      "plural": null,
+      "english_meaning": "to do without, to abstain",
+      "german_explanation": "Etwas nicht benutzen oder nicht essen, obwohl man es mag",
+      "example_sentence": "Ich muss auf Zucker verzichten.",
+      "word_type": "verb",
+      "difficulty": "B1",
+      "is_essential": true
+    },
+    {
+      "german_term": "das Immunsystem",
+      "article": "das",
+      "plural": "Immunsysteme",
+      "english_meaning": "immune system",
+      "german_explanation": "Das System im Körper, das gegen Krankheiten kämpft",
+      "example_sentence": "Das Immunsystem reagiert auf Gluten.",
+      "word_type": "noun",
+      "difficulty": "B2",
+      "is_essential": true
+    }
+  ],
+  "useful_phrases": [
+    {
+      "german_phrase": "Es geht um...",
+      "english_meaning": "It's about...",
+      "example_sentence": "In diesem Artikel geht es um eine neue Studie."
+    },
+    {
+      "german_phrase": "im Vergleich zu",
+      "english_meaning": "compared to",
+      "example_sentence": "Im Vergleich zu letztem Jahr gibt es mehr Fortschritte."
+    }
+  ],
+  "grammar_notes": [
+    {
+      "topic": "Nebensätze mit 'weil'",
+      "explanation": "Nach 'weil' steht das Verb am Ende des Satzes.",
+      "example": "Sie verzichtet auf Gluten, weil sie Zöliakie hat."
+    }
+  ],
+  "comprehension_questions": [
+    "Was ist Zöliakie?",
+    "Was haben die Forscher entdeckt?",
+    "Warum ist diese Forschung wichtig?"
+  ],
+  "conversation_questions": {
+    "opinion": ["Was denkst du über medizinische Forschung im Allgemeinen?"],
+    "personal": ["Kennst du jemanden mit einer Lebensmittelunverträglichkeit?"]
+  },
+  "english_summary": "Researchers have found new insights into how the immune system reacts to gluten in people with celiac disease, a step that could support future treatments.",
+  "difficult_concepts": [
+    { "term": "Zöliakie", "explanation_en": "Celiac disease: an autoimmune condition triggered by eating gluten." }
+  ],
+  "chatgpt_instructions": "Use this document for a German conversation lesson. Speak mainly in German at B1 level. Use short sentences and ask only one question at a time. Begin by reading one short paragraph from the article. Then ask me to explain what it means. Correct my important mistakes gently. When I ask you to repeat something, repeat only the relevant sentence. Help me restate difficult sentences in simpler German. Use the vocabulary list during the conversation.",
+  "source": {
+    "title": "Progress in celiac disease research",
+    "publication": "Example Science News",
+    "url": "https://example.com/news/celiac-research-progress",
+    "author": "A. Reporter",
+    "published_date": "2026-07-15"
+  }
+}
