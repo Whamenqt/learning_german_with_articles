@@ -218,6 +218,8 @@ export function EditorPage() {
       const updatedArticle = await updateArticleFields(article.id, {
         german_title: article.german_title,
         language_level: article.language_level,
+        vocabulary_focus: article.vocabulary_focus,
+        source_description: article.source_description,
       })
       setArticle(updatedArticle)
       setNotice('Saved.')
@@ -357,6 +359,24 @@ export function EditorPage() {
               <option value="B2">B2</option>
             </select>
           </div>
+        </div>
+        <div className="field">
+          <label>Search keywords</label>
+          <input
+            value={article.vocabulary_focus ?? ''}
+            placeholder="e.g. Weltraum, Mars, Wissenschaft, Zukunft"
+            onChange={(e) => setArticle({ ...article, vocabulary_focus: e.target.value })}
+          />
+          <span className="hint">Separate keywords with commas. They appear as filters and tags on the Learn page.</span>
+        </div>
+        <div className="field">
+          <label>Library card description</label>
+          <textarea
+            rows={2}
+            value={article.source_description ?? ''}
+            placeholder="A short description shown in the public article library."
+            onChange={(e) => setArticle({ ...article, source_description: e.target.value })}
+          />
         </div>
         <div className="field">
           <label>Introduction</label>

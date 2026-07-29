@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { fetchPublishedArticleBySlug, recordExport } from '@/lib/api'
 import { buildMarkdownExport, downloadDocxExport, downloadTextFile } from '@/lib/exportDocument'
+import { PublicLayout } from '@/components/layout/PublicLayout'
+import { isArticleComplete, setArticleComplete } from '@/lib/progress'
 import type { FullArticle, LanguageLevel, QuizQuestion } from '@/lib/types'
 
 const LEVEL_LABEL: Record<LanguageLevel, string> = {
@@ -69,6 +71,7 @@ export function ArticlePage() {
   const [data, setData] = useState<FullArticle | null | undefined>(undefined) // undefined = loading, null = not found
   const [error, setError] = useState<string | null>(null)
   const [exporting, setExporting] = useState<'docx' | 'markdown' | null>(null)
+  const [complete, setComplete] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -79,6 +82,7 @@ export function ArticlePage() {
 
   useEffect(() => {
     if (!data) return
+    setComplete(isArticleComplete(data.article.id))
     document.title = `${data.article.german_title ?? 'German Learning Article'} · German News Learning`
     let meta = document.querySelector('meta[name="robots"]')
     if (!meta) {
@@ -141,15 +145,28 @@ export function ArticlePage() {
   }
 
   return (
-    <>
-      <nav className="top-nav print-hide">
-        <div className="container">
-          <Link to="/">German News Learning</Link>
-        </div>
-      </nav>
+    <PublicLayout>
       <main className="container container--narrow page">
         <div className="breadcrumb print-hide">
-          <Link to="/">German News Learning</Link> / Articles
+          <Link to="/learn">Alle Artikel</Link> / {article.language_level}
+        </div>
+
+        <div className="lesson-progress print-hide">
+          <div>
+            <strong>{complete ? 'Lektion abgeschlossen' : 'Dein Lernfortschritt'}</strong>
+            <span>{complete ? 'Gut gemacht – du kannst den Text jederzeit wiederholen.' : 'Markiere die Lektion, wenn du alle Schritte beendet hast.'}</span>
+          </div>
+          <button
+            type="button"
+            className={complete ? 'btn btn--complete' : 'btn'}
+            onClick={() => {
+              const next = !complete
+              setArticleComplete(article.id, next)
+              setComplete(next)
+            }}
+          >
+            {complete ? '✓ Abgeschlossen' : 'Als abgeschlossen markieren'}
+          </button>
         </div>
 
         <div className="article-header">
@@ -325,6 +342,6 @@ export function ArticlePage() {
           {article.source_publication ? ` (${article.source_publication})` : ''}.
         </footer>
       </main>
-    </>
+    </PublicLayout>
   )
 }

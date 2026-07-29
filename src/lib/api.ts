@@ -312,6 +312,17 @@ export async function fetchPublishedArticleBySlug(slug: string): Promise<FullArt
   }
 }
 
+export async function fetchPublishedArticles(): Promise<ArticleRow[]> {
+  const { data, error } = await supabase
+    .from('articles')
+    .select('*')
+    .eq('status', 'published')
+    .eq('is_public', true)
+    .order('published_at', { ascending: false })
+  if (error) throw error
+  return (data as ArticleRow[]) ?? []
+}
+
 // ---------------------------------------------------------------------------
 // Generation logs (lightweight audit trail)
 // ---------------------------------------------------------------------------
