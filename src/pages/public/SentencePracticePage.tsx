@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { PublicNav } from '@/components/layout/PublicNav'
+import { PublicLayout } from '@/components/layout/PublicLayout'
 import { fetchSentencesByLevel } from '@/lib/api'
 import type { LanguageLevel, Sentence } from '@/lib/types'
 
@@ -105,11 +105,10 @@ export function SentencePracticePage() {
   const answerText = current ? (promptIsGerman ? current.english : current.german) : ''
 
   return (
-    <>
-      <PublicNav />
+    <PublicLayout>
       <main className="container container--narrow page">
         <div className="breadcrumb print-hide">
-          <a href="/">German News Learning</a> / Sentence Practice
+          <a href="/learn">Alle Artikel</a> / Sentence Practice
         </div>
 
         <h1 style={{ fontSize: 30, margin: '0 0 6px' }}>Sentence Practice</h1>
@@ -221,6 +220,6 @@ export function SentencePracticePage() {
           </div>
         )}
       </main>
-    </>
+    </PublicLayout>
   )
 }

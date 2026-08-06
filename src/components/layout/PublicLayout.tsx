@@ -16,6 +16,7 @@ export function PublicLayout({ children }: { children: ReactNode }) {
           <nav aria-label="Main navigation">
             <NavLink to="/" end>Home</NavLink>
             <NavLink to="/learn">Learn</NavLink>
+            <NavLink to="/practice">Practice</NavLink>
             <Link to="/login" className="nav-admin">Admin</Link>
           </nav>
         </div>
