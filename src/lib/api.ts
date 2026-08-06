@@ -9,6 +9,7 @@ import type {
   LanguageLevel,
   LessonJSON,
   Quiz,
+  Sentence,
   VocabularyRow,
 } from './types'
 
@@ -312,17 +313,6 @@ export async function fetchPublishedArticleBySlug(slug: string): Promise<FullArt
   }
 }
 
-export async function fetchPublishedArticles(): Promise<ArticleRow[]> {
-  const { data, error } = await supabase
-    .from('articles')
-    .select('*')
-    .eq('status', 'published')
-    .eq('is_public', true)
-    .order('published_at', { ascending: false })
-  if (error) throw error
-  return (data as ArticleRow[]) ?? []
-}
-
 // ---------------------------------------------------------------------------
 // Generation logs (lightweight audit trail)
 // ---------------------------------------------------------------------------
@@ -352,4 +342,18 @@ export async function recordExport(articleId: string, format: 'docx' | 'markdown
     storage_path: storagePath ?? null,
   })
   if (error) console.error('recordExport failed', error)
+}
+
+// ---------------------------------------------------------------------------
+// Sentence Practice
+// ---------------------------------------------------------------------------
+
+export async function fetchSentencesByLevel(level: LanguageLevel): Promise<Sentence[]> {
+  const { data, error } = await supabase
+    .from('sentences')
+    .select('*')
+    .eq('level', level)
+    .order('sort_order', { ascending: true })
+  if (error) throw error
+  return (data as Sentence[]) ?? []
 }

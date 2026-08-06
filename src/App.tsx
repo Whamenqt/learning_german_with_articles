@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from '@/lib/AuthContext'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { LoginPage } from '@/pages/admin/LoginPage'
@@ -7,17 +7,15 @@ import { NewArticlePage } from '@/pages/admin/NewArticlePage'
 import { GeneratePage } from '@/pages/admin/GeneratePage'
 import { EditorPage } from '@/pages/admin/EditorPage'
 import { ArticlePage } from '@/pages/public/ArticlePage'
+import { SentencePracticePage } from '@/pages/public/SentencePracticePage'
 import { NotFoundPage } from '@/pages/public/NotFoundPage'
-import { HomePage } from '@/pages/public/HomePage'
-import { LearnPage } from '@/pages/public/LearnPage'
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/" element={<Navigate to="/admin" replace />} />
           <Route path="/login" element={<LoginPage />} />
 
           <Route
@@ -55,6 +53,7 @@ function App() {
 
           {/* Public, unauthenticated */}
           <Route path="/articles/:slug" element={<ArticlePage />} />
+          <Route path="/practice" element={<SentencePracticePage />} />
 
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

@@ -161,3 +161,14 @@ export interface FullArticle {
   content: ArticleContentRow | null
   vocabulary: VocabularyRow[]
 }
+
+/** A single English/German sentence pair used by the Sentence Practice tool. */
+export interface Sentence {
+  id: string
+  level: LanguageLevel
+  english: string
+  german: string
+  notes: string | null
+  sort_order: number
+  created_at: string
+}
